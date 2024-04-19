@@ -27,12 +27,11 @@ void initialize_matrix_row(std::vector<std::vector<int>> &matrix, std::string li
     }
 }
 
-void read_instance(std::string path, std::vector<Serv*> &servs, std::vector<std::vector<int>> &m_time, std::vector<std::vector<int>> & m_cost){
+void read_instance(std::string path, std::vector<Serv*> &servs, std::vector<std::vector<int>> &m_time, std::vector<std::vector<int>> & m_cost, int& local_cost){
     std::ifstream file(path);
 
     int n_jobs = 0;
     int n_servs = 0;
-    int local_cost = 0;
 
     if(file.is_open()){
         int i = 0;
