@@ -2,11 +2,8 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include "file_operations.h"
 
-typedef struct serv{
-    int capacity = 0;
-    std::vector<int> job_indexes;
-}Serv;
 
 void initialize_matrix_row(std::vector<std::vector<int>> &matrix, std::string line, int n_servs){
     static int current_row = 0;
@@ -27,7 +24,7 @@ void initialize_matrix_row(std::vector<std::vector<int>> &matrix, std::string li
     }
 }
 
-void read_instance(std::string path, std::vector<Serv*> &servs, std::vector<std::vector<int>> &m_time, std::vector<std::vector<int>> & m_cost, int& local_cost){
+void read_instance(std::string path, std::vector<Serv*> &servs, std::vector<std::vector<int>> &m_time, std::vector<std::vector<int>> & m_cost, Local &local){
     std::ifstream file(path);
 
     int n_jobs = 0;
@@ -44,7 +41,9 @@ void read_instance(std::string path, std::vector<Serv*> &servs, std::vector<std:
             }
 
             else if(i == 2){
-                local_cost = std::stoi(line);
+                Local *aux = new Local;
+
+                aux -> local_cost = std::stoi(line);
             }
             else if(i == 4){
                 std::string server_capacity = line;
