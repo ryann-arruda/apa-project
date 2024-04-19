@@ -6,20 +6,22 @@ void greedy_algorithm(std::vector<std::vector<int>> &m_cost, std::vector<std::ve
 int main(int argc, char* argv[]) {
     std::vector<Serv*> servs;
     std::vector<std::vector<int>> m_time, m_cost;
-    int local_cost = 0;
+    Local local;
 
     std::string path = "test instances/n5m15A.txt";
 
-    read_instance(path, servs, m_time, m_cost, local_cost);
+    read_instance(path, servs, m_time, m_cost, local);
 
-    std::pair<std::vector<std::vector<Serv*>>, int> solution;
+    std::pair<std::vector<std::vector<Serv*>>, Local> solution;
 
     greedy_algorithm(m_cost, m_time, solution);
+
+    read_instance(path, servs, m_time, m_cost, local);
 
     return 0;
 }
 
-void greedy_algorithm(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<std::vector<Serv*>>, int> solution){
+void greedy_algorithm(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<std::vector<Serv*>>, Local> solution){
     std::vector<std::vector<double>> cost_per_minute;
 
     for(int i = 0; i < m_cost.size(); i++){
