@@ -17,21 +17,6 @@ int main(int argc, char* argv[]) {
 
     greedy_algorithm(m_cost, m_time, servs, local, solution);
 
-    for(int i = 0; i < solution.first->size(); i++){
-        for(int j = 0; j < (*solution.first)[i]->job_indexes.size(); j++){
-            std::cout << (*solution.first)[i]->job_indexes[j] << " ";
-        }
-
-        std::cout << std::endl;
-    }
-
-    std::cout << "-----------------------------" << std::endl;
-
-    for(int i = 0; i < solution.second->job_indexes.size(); i++){
-        std::cout << solution.second->job_indexes[i] << " ";
-    }
-    std::cout << std::endl;
-
     return 0;
 }
 
@@ -47,7 +32,7 @@ void greedy_algorithm(std::vector<std::vector<int>> &m_cost, std::vector<std::ve
 
         cost_per_minute.push_back(line);
     }
-
+    
     for(int job = 0; job < cost_per_minute[0].size(); job++){
         double best = std::numeric_limits<double>::max();
         int index = -1;
