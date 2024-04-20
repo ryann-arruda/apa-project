@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <cctype>
 #include "file_operations.h"
 
 
@@ -60,7 +61,7 @@ void read_instance(std::string path, std::vector<Serv*> &servs, std::vector<std:
             else if(i >= 6 && i < 6 + n_servs){
                 initialize_matrix_row(m_time, line, n_servs);
             }
-            else if(i > 6 + n_servs && line != "" && file.eof() != true){
+            else if(i > 6 + n_servs && line != "" && (isdigit(line[0]) != 0)){
                 initialize_matrix_row(m_cost, line, n_servs);
             }
 
