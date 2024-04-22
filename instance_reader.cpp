@@ -3,8 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <cctype>
-#include "file_operations.h"
-
+#include "instance_reader.hpp"
 
 void initialize_matrix_row(std::vector<std::vector<int>> &matrix, std::string line, int n_servs){
     static int current_row = 0;
