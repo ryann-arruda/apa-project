@@ -41,9 +41,7 @@ void read_instance(std::string path, std::vector<Serv*> &servs, std::vector<std:
             }
 
             else if(i == 2){
-                Local *aux = new Local;
-
-                aux -> local_cost = std::stoi(line);
+                local.local_cost = std::stoi(line);
             }
             else if(i == 4){
                 std::string server_capacity = line;
