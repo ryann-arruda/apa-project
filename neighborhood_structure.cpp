@@ -73,6 +73,13 @@ std::pair<std::vector<Serv*>*, Local*> makeSwap(std::vector<std::vector<int>> &m
 
     if((*preSolution.first)[serv1]->capacity + m_time[serv1][job1] >= m_time[serv1][job2] && (*preSolution.first)[serv2]->capacity + m_time[serv2][job2] >= m_time[serv2][job1]){
         if(m_cost[serv1][job2] + m_cost[serv2][job1] < m_cost[serv1][job1] + m_cost[serv2][job2]){
+
+            (*preSolution.first)[serv1]->capacity += m_time[serv1][job1];
+            (*preSolution.first)[serv1]->capacity -= m_time[serv1][job2];
+
+            (*preSolution.first)[serv2]->capacity += m_time[serv2][job2];
+            (*preSolution.first)[serv2]->capacity -= m_time[serv2][job1];
+
             std::swap((*preSolution.first)[serv1]->job_indexes[job1], (*preSolution.first)[serv2]->job_indexes[job2]);
         }
     }
@@ -123,9 +130,9 @@ std::pair<std::vector<Serv*>*, Local*> makeReinsertion(std::vector<std::vector<i
 
     if((*preSolution.first)[serv2]->capacity >= m_time[serv2][job1]){
         if(m_cost[serv2][job1] < m_cost[serv1][job1]){
+            (*preSolution.first)[serv2]->job_indexes.push_back((*preSolution.first)[serv1]->job_indexes[job1]);
             (*preSolution.first)[serv1]->job_indexes.erase((*preSolution.first)[serv1]->job_indexes.begin()+job1);
             (*preSolution.first)[serv1]->capacity += m_time[serv1][job1];
-            (*preSolution.first)[serv2]->job_indexes.push_back(job1);
             (*preSolution.first)[serv2]->capacity -= m_time[serv2][job1];
         }
     }
