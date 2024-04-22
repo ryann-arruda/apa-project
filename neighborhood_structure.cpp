@@ -10,11 +10,14 @@ std::pair<std::vector<Serv*>*, Local*> exploreNeighborhood(int current, std::vec
             return makeSwap(m_cost, m_time, preSolution);
             break;
         case 1:
+            return makeReinsertion(m_cost, m_time, preSolution);
             break;
         case 2:
+            return makeModifiedEjectionChain(m_cost, m_time, preSolution);
             break;
+        
         default:
-            break;
+            return std::make_pair(nullptr, nullptr);
     }
 }
 
@@ -125,6 +128,38 @@ std::pair<std::vector<Serv*>*, Local*> makeReinsertion(std::vector<std::vector<i
             (*preSolution.first)[serv2]->job_indexes.push_back(job1);
             (*preSolution.first)[serv2]->capacity -= m_time[serv2][job1];
         }
+    }
+
+    return preSolution;
+}
+
+std::pair<std::vector<Serv*>*, Local*> makeModifiedEjectionChain(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<Serv*>*, Local*> preSolution){
+    std::default_random_engine generator;
+    int job;
+
+    for(int serv = 0; serv < preSolution.first -> size() - 1; serv++){
+        std::uniform_int_distribution<int> jobs_serv(0,(*preSolution.first)[serv]->job_indexes.size() - 1);
+
+        job = jobs_serv(generator);
+
+        if((*preSolution.first)[serv + 1] -> capacity >= m_time[serv + 1][job]){
+            if(m_cost[serv + 1][job] < m_cost[serv][job]){
+                (*preSolution.first)[serv]->job_indexes.erase((*preSolution.first)[serv]->job_indexes.begin()+job);
+                (*preSolution.first)[serv]->capacity += m_time[serv][job];
+                (*preSolution.first)[serv + 1]->job_indexes.push_back(job);
+                (*preSolution.first)[serv + 1]->capacity -= m_time[serv][job];
+            }
+        }
+    }
+
+    int last_serv = preSolution.first -> size() - 1;
+    std::uniform_int_distribution<int> jobs_serv(0,(*preSolution.first)[last_serv]->job_indexes.size() - 1);
+    job = jobs_serv(generator);
+
+    if(preSolution.second -> local_cost < m_cost[last_serv][job]){
+        preSolution.second -> job_indexes.push_back((*preSolution.first)[last_serv]->job_indexes[job]);
+        (*preSolution.first)[last_serv]->job_indexes.erase((*preSolution.first)[last_serv]->job_indexes.begin()+job);
+        (*preSolution.first)[last_serv]->capacity += m_time[last_serv][job];
     }
 
     return preSolution;
