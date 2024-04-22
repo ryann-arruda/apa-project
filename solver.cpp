@@ -1,5 +1,6 @@
 #include "instance_reader.hpp"
 #include "data_types.hpp"
+#include "neighborhood_structure.hpp"
 #include <iostream>
 #include <limits>
 
@@ -10,13 +11,51 @@ int main(int argc, char* argv[]) {
     std::vector<std::vector<int>> m_time, m_cost;
     Local local;
 
-    std::string path = "test instances/n5m15A.txt";
+    std::string path = "test instances/n60m10.txt";
 
     read_instance(path, servs, m_time, m_cost, local);
 
     std::pair<std::vector<Serv*>*, Local*> solution;
 
     greedy_algorithm(m_cost, m_time, servs, local, solution);
+
+    std::cout << "Servidores: " << std::endl;
+    for(int i = 0; i < solution.first -> size(); i++){
+        for(int j = 0; j < (*solution.first)[i]->job_indexes.size(); j++){
+            std::cout << (*solution.first)[i] -> job_indexes[j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    std::cout << std::endl;
+
+    std::cout << "Local: " << std::endl;
+    for(int i = 0; i < solution.second->job_indexes.size(); i++){
+        std::cout << solution.second->job_indexes[i] << " ";
+    }
+    std::cout << std::endl;
+
+    solution = makeSwap(m_cost, m_time, solution);
+
+    std::cout << std::endl;
+    std::cout << "Depois do swap: " << "\n\n";
+
+    std::cout << "Servidores: " << std::endl;
+    for(int i = 0; i < solution.first -> size(); i++){
+        for(int j = 0; j < (*solution.first)[i]->job_indexes.size(); j++){
+            std::cout << (*solution.first)[i] -> job_indexes[j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    std::cout << std::endl;
+
+    std::cout << "Local: " << std::endl;
+    for(int i = 0; i < solution.second->job_indexes.size(); i++){
+        std::cout << solution.second->job_indexes[i] << " ";
+    }
+    std::cout << std::endl;
+
 
     return 0;
 }
