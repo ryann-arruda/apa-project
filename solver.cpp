@@ -5,13 +5,14 @@
 #include <limits>
 
 void greedy_algorithm(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::vector<Serv*> &servs, Local& local, std::pair<std::vector<Serv*>*, Local*> &solution);
+int objective_function(std::vector<std::vector<int>> &m_cost, std::pair<std::vector<Serv*>*, Local*> &solution);
 
 int main(int argc, char* argv[]) {
     std::vector<Serv*> servs;
     std::vector<std::vector<int>> m_time, m_cost;
     Local local;
 
-    std::string path = "test instances/n60m10.txt";
+    std::string path = "test instances/n5m15A.txt";
 
     read_instance(path, servs, m_time, m_cost, local);
 
@@ -35,7 +36,7 @@ int main(int argc, char* argv[]) {
     }
     std::cout << std::endl;
 
-    solution = makeSwap(m_cost, m_time, solution);
+    solution = exploreNeighborhood(2, m_cost, m_time, solution);
 
     std::cout << std::endl;
     std::cout << "Depois do swap: " << "\n\n";
