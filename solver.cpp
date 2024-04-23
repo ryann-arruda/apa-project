@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
     std::vector<std::vector<int>> m_time, m_cost;
     Local local;
 
-    std::string path = "test instances/n5m15A.txt";
+    std::string path = "test instances/n5m15B.txt";
 
     read_instance(path, servs, m_time, m_cost, local);
 
@@ -57,6 +57,10 @@ int main(int argc, char* argv[]) {
     }
     std::cout << std::endl;
 
+    int custo_local = objective_function(m_cost,solution);
+
+    std::cout << "custo local: " << custo_local << std::endl;
+
 
     return 0;
 }
@@ -96,4 +100,22 @@ void greedy_algorithm(std::vector<std::vector<int>> &m_cost, std::vector<std::ve
 
     solution.first = &servs;
     solution.second = &local;
+}
+
+int objective_function(std::vector<std::vector<int>> &m_cost, std::pair<std::vector<Serv*>*, Local*> &solution) {
+    int cost_total = 0;
+
+    std::vector<Serv*> *servs = solution.first;
+    for (size_t i = 0; i < servs->size(); ++i) {
+        Serv *servidor = (*servs)[i];
+        for (size_t j = 0; j < servidor->job_indexes.size(); ++j) {
+            int job_index = servidor->job_indexes[j];
+            cost_total += m_cost[i][job_index];
+        }
+    }
+
+    Local *local = solution.second;
+    cost_total += local->local_cost * local->job_indexes.size();
+
+    return cost_total;
 }
