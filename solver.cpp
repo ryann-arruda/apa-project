@@ -6,13 +6,14 @@
 
 void greedy_algorithm(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::vector<Serv*> &servs, Local& local, std::pair<std::vector<Serv*>*, Local*> &solution);
 int objective_function(std::vector<std::vector<int>> &m_cost, std::pair<std::vector<Serv*>*, Local*> &solution);
+std::pair<std::vector<Serv*>*, Local*> vnd(int n_neighborhood_structure, std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<Serv*>*, Local*> solution);
 
 int main(int argc, char* argv[]) {
     std::vector<Serv*> servs;
     std::vector<std::vector<int>> m_time, m_cost;
     Local local;
 
-    std::string path = "test instances/n5m15B.txt";
+    std::string path = "test instances/n5m15A.txt";
 
     read_instance(path, servs, m_time, m_cost, local);
 
@@ -36,10 +37,11 @@ int main(int argc, char* argv[]) {
     }
     std::cout << std::endl;
 
-    solution = exploreNeighborhood(2, m_cost, m_time, solution);
+    std::cout << "Depois do vnd: " << "\n\n";
+
+    solution = vnd(0, m_cost, m_time, solution);
 
     std::cout << std::endl;
-    std::cout << "Depois do swap: " << "\n\n";
 
     std::cout << "Servidores: " << std::endl;
     for(int i = 0; i < solution.first -> size(); i++){
@@ -56,10 +58,6 @@ int main(int argc, char* argv[]) {
         std::cout << solution.second->job_indexes[i] << " ";
     }
     std::cout << std::endl;
-
-    int custo_local = objective_function(m_cost,solution);
-
-    std::cout << "custo local: " << custo_local << std::endl;
 
 
     return 0;
@@ -118,4 +116,27 @@ int objective_function(std::vector<std::vector<int>> &m_cost, std::pair<std::vec
     cost_total += local->local_cost * local->job_indexes.size();
 
     return cost_total;
+}
+
+std::pair<std::vector<Serv*>*, Local*> vnd(int n_neighborhood_structure, std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<Serv*>*, Local*> solution){
+    int k = 0; // first neighborhood structure
+
+    std::pair<std::vector<Serv*>*, Local*> *bestSolution = &solution;
+
+    while(k <= n_neighborhood_structure){
+        std::pair<std::vector<Serv*>*, Local*> aux = exploreNeighborhood(k, m_cost, m_time, *bestSolution);
+
+        int firstCost = objective_function(m_cost, *bestSolution);
+        int secondCost = objective_function(m_cost, aux);
+
+        if(secondCost < firstCost){
+            *bestSolution = aux;
+        }
+        else{
+            k += 1;
+        }
+    }
+
+    std::cout << "objective function: " << objective_function(m_cost, *bestSolution) << std::endl;
+    return *bestSolution;
 }
