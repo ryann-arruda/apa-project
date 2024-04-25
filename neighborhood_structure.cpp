@@ -2,6 +2,8 @@
 #include <iostream>
 #include <random>
 #include <utility>
+#include <chrono>
+#include <limits>
 
 std::pair<std::vector<Serv*>*, Local*> exploreNeighborhood(int current, std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<Serv*>*, Local*> preSolution){
     
@@ -21,66 +23,66 @@ std::pair<std::vector<Serv*>*, Local*> exploreNeighborhood(int current, std::vec
     }
 }
 
+//std::pair<std::vector<Serv*>*, Local*> preSolution
 std::pair<std::vector<Serv*>*, Local*> makeSwap(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<Serv*>*, Local*> preSolution){
+    int origin_serv = 0, origin_job = 0;
+    int dest_serv = 0, dest_job = 0;
+    int best_cost = std::numeric_limits<int>::max();
 
-    std::default_random_engine generator;
-    std::uniform_int_distribution<int> options(0,1);
+    int numb_servs = preSolution.first -> size();
+    for(int serv1 = 0; serv1 < numb_servs - 1; serv1++){
+        for(int job1 = 0; job1 < (*preSolution.first)[serv1]->job_indexes.size(); job1++){
 
-    int result = options(generator);
+            for(int serv2 = serv1 + 1; serv2 < numb_servs; serv2++){
+                for(int job2 = 0; job2 < (*preSolution.first)[serv2]->job_indexes.size(); job2++){
+                    int exec_time_serv1 = m_time[serv1][job1] + (*preSolution.first)[serv1]->capacity;
+                    int exec_time_serv2 = m_time[serv2][job2] + (*preSolution.first)[serv2]->capacity;
 
-    int serv1 = 0;
-    int serv2 = 0;
-    int job1 = 0;
-    int job2 = 0;
+                    if(exec_time_serv1 >= m_time[serv1][job2] && exec_time_serv2 >= m_time[serv2][job1]){
+                        int exchange_cost = m_cost[serv1][job2] + m_cost[serv2][job1] - m_cost[serv1][job1] - m_cost[serv2][job2];
 
-    if(result == 0){
-        std::uniform_int_distribution<int> servs(0,preSolution.first->size() - 1);
+                        if(exchange_cost < best_cost){
+                            best_cost = exchange_cost;
+                            origin_serv = serv1;
+                            dest_serv = serv2;
+                            origin_job = job1;
+                            dest_job = job2;
+                        }
+                    }
 
-        serv1 = servs(generator);
-        serv2 = -1;
+                }
+            }
+        }
+    }
 
-        std::uniform_int_distribution<int> jobs_serv1(0,(*preSolution.first)[serv1]->job_indexes.size() - 1);
+    for(int serv1 = 0; serv1 < numb_servs; serv1++){
+        for(int job1 = 0; job1 < (*preSolution.first)[serv1]->job_indexes.size(); job1++){
+            for(int job2 = 0; job2 < preSolution.second->job_indexes.size(); job2++){
+                int exec_time_serv1 = m_time[serv1][job1] + (*preSolution.first)[serv1]->capacity;
 
-        job1 = jobs_serv1(generator);
-        job2 = -1;
+                int job_local = (*preSolution.second).job_indexes[job2];
+                int local_cost = preSolution.second->local_cost;
+                if(exec_time_serv1 >= m_time[serv1][job_local]){
+                    int exchange_cost = m_cost[serv1][job_local] - m_cost[serv1][job1];
 
-        result = options(generator);
+                    if(exchange_cost < best_cost){
+                        best_cost = exchange_cost;
+                        origin_serv = serv1;
+                        dest_serv = -1;
+                        origin_job = job1;
+                        dest_job = job2;
+                    }
+                }
+            }
+        }
+    }
 
-        if(result == 0){
-            serv2 = servs(generator);
-
-            std::uniform_int_distribution<int> jobs_serv2(0,(*preSolution.first)[serv2]->job_indexes.size() - 1);
-
-            job2 = jobs_serv2(generator);
+    if(best_cost != std::numeric_limits<int>::max()){
+        if(dest_serv != -1){
+            std::swap((*preSolution.first)[origin_serv]->job_indexes[origin_job], (*preSolution.first)[dest_serv]->job_indexes[dest_job]);
         }
         else{
-            std::uniform_int_distribution<int> jobs_local(0,preSolution.second->job_indexes.size() - 1);
-
-            job2 = jobs_local(generator);
-        }
-    }
-    else{
-        std::uniform_int_distribution<int> jobs_local(0,preSolution.second->job_indexes.size() - 1);
-
-        job1 = jobs_local(generator);
-
-        std::uniform_int_distribution<int> servs(0,preSolution.first->size() - 1);
-        serv1 = servs(generator);
-
-        std::uniform_int_distribution<int> jobs_serv(0,(*preSolution.first)[serv1]->job_indexes.size() - 1);
-        job2 = jobs_serv(generator);
-    }
-
-    if((*preSolution.first)[serv1]->capacity + m_time[serv1][job1] >= m_time[serv1][job2] && (*preSolution.first)[serv2]->capacity + m_time[serv2][job2] >= m_time[serv2][job1]){
-        if(m_cost[serv1][job2] + m_cost[serv2][job1] < m_cost[serv1][job1] + m_cost[serv2][job2]){
-
-            (*preSolution.first)[serv1]->capacity += m_time[serv1][job1];
-            (*preSolution.first)[serv1]->capacity -= m_time[serv1][job2];
-
-            (*preSolution.first)[serv2]->capacity += m_time[serv2][job2];
-            (*preSolution.first)[serv2]->capacity -= m_time[serv2][job1];
-
-            std::swap((*preSolution.first)[serv1]->job_indexes[job1], (*preSolution.first)[serv2]->job_indexes[job2]);
+            std::swap((*preSolution.first)[origin_serv]->job_indexes[origin_job], preSolution.second->job_indexes[dest_job]);
         }
     }
 
@@ -88,8 +90,8 @@ std::pair<std::vector<Serv*>*, Local*> makeSwap(std::vector<std::vector<int>> &m
 }
 
 std::pair<std::vector<Serv*>*, Local*> makeReinsertion(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<Serv*>*, Local*> preSolution){
-    
-    std::default_random_engine generator;
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator(seed);
     std::uniform_int_distribution<int> options(0,1);
 
     int result = options(generator);
@@ -141,7 +143,8 @@ std::pair<std::vector<Serv*>*, Local*> makeReinsertion(std::vector<std::vector<i
 }
 
 std::pair<std::vector<Serv*>*, Local*> makeModifiedEjectionChain(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<Serv*>*, Local*> preSolution){
-    std::default_random_engine generator;
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator(seed);
     int job;
 
     for(int serv = 0; serv < preSolution.first -> size() - 1; serv++){
