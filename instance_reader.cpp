@@ -24,7 +24,7 @@ void initialize_matrix_row(std::vector<std::vector<int>> &matrix, std::string li
     }
 }
 
-void read_instance(std::string path, std::vector<Serv*> &servs, std::vector<std::vector<int>> &m_time, std::vector<std::vector<int>> & m_cost, Local &local){
+void read_instance(std::string path, std::vector<Serv> &servs, std::vector<std::vector<int>> &m_time, std::vector<std::vector<int>> & m_cost, Local &local){
     std::ifstream file(path);
 
     int n_jobs = 0;
@@ -52,7 +52,7 @@ void read_instance(std::string path, std::vector<Serv*> &servs, std::vector<std:
                     Serv *aux = new Serv;
                     aux -> capacity = std::stoi(capacity);
 
-                    servs.push_back(aux);
+                    servs.push_back(*aux);
                 }
             }
             else if(i >= 6 && i < 6 + n_servs){
