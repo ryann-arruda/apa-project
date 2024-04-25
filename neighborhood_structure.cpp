@@ -100,52 +100,44 @@ std::pair<std::vector<Serv>, Local> makeSwap(std::vector<std::vector<int>> &m_co
 }
 
 std::pair<std::vector<Serv>, Local> makeReinsertion(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<Serv>, Local> preSolution){
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::default_random_engine generator(seed);
-    std::uniform_int_distribution<int> options(0,1);
+    std::vector<Serv> servs = preSolution.first;
+    Local local = preSolution.second;
 
-    int result = options(generator);
-    int serv1;
-    int serv2;
-    int job1;
+    int origin_serv = 0, origin_job = 0;
+    int dest_serv = 0;
+    int best_cost = std::numeric_limits<int>::max();
 
-    if(result == 0 ){
-        std::uniform_int_distribution<int> servs(0,preSolution.first.size() - 1);
+    for(int serv1 = 0; serv1 < servs.size()-1; serv1++){
+        for(int job = 0; job < servs[serv1].job_indexes.size(); job++){
+            for(int serv2 = 0; serv2 < servs.size(); serv2++){
+                if(serv1 == serv2){
+                    continue;
+                }
 
-        serv1 = servs(generator);
+                if(servs[serv2].capacity >= m_time[serv2][job]){
+                    int cost = m_cost[serv2][job] - m_cost[serv1][job];
+                    if(cost < best_cost){
+                        best_cost = cost;
+                        origin_serv = serv1;
+                        dest_serv = serv2;
+                        origin_job = job;
+                    }
 
-        std::uniform_int_distribution<int> jobs_serv1(0,preSolution.first[serv1].job_indexes.size() - 1);
+                }
 
-        job1 = jobs_serv1(generator);
-
-        result = options(generator);
-
-        if(result == 0){
-
-            serv2 = servs(generator);
-
+            }
         }
-
     }
+    
+    int last_server = servs.size()-1;
 
-    else{
-
-        std::uniform_int_distribution<int> jobs_local(0,preSolution.second.job_indexes.size() - 1);
-
-        job1 = jobs_local(generator);
-
-        std::uniform_int_distribution<int> servs(0,preSolution.first.size() - 1);
-
-        serv1 = servs(generator);
-    }
-
-
-    if(preSolution.first[serv2].capacity >= m_time[serv2][job1]){
-        if(m_cost[serv2][job1] < m_cost[serv1][job1]){
-            preSolution.first[serv2].job_indexes.push_back(preSolution.first[serv1].job_indexes[job1]);
-            preSolution.first[serv1].job_indexes.erase(preSolution.first[serv1].job_indexes.begin()+job1);
-            preSolution.first[serv1].capacity += m_time[serv1][job1];
-            preSolution.first[serv2].capacity -= m_time[serv2][job1];
+    for(int job = 0; job < servs[last_server].job_indexes.size(); job++){
+        int cost = local.local_cost - m_cost[last_server][job];
+        if(cost < best_cost){
+            best_cost = cost;
+            origin_serv = last_server;
+            dest_serv = -1;
+            origin_job = job;
         }
     }
 
