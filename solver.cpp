@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
 
     greedy_algorithm(m_cost, m_time, servs, local, solution);
 
+    std::cout << "Objective function (before): " << objective_function(m_cost, solution) << std::endl;
     std::cout << "Servidores: " << std::endl;
     for(int i = 0; i < solution.first -> size(); i++){
         for(int j = 0; j < (*solution.first)[i]->job_indexes.size(); j++){
@@ -40,7 +41,8 @@ int main(int argc, char* argv[]) {
     std::cout << "Depois do vnd: " << "\n\n";
 
     solution = vnd(0, m_cost, m_time, solution);
-
+    //solution = exploreNeighborhood(0, m_cost, m_time, solution);
+    std::cout << "Objective function (after): " << objective_function(m_cost, solution);
     std::cout << std::endl;
 
     std::cout << "Servidores: " << std::endl;
@@ -137,6 +139,5 @@ std::pair<std::vector<Serv*>*, Local*> vnd(int n_neighborhood_structure, std::ve
         }
     }
 
-    std::cout << "objective function: " << objective_function(m_cost, *bestSolution) << std::endl;
     return *bestSolution;
 }
