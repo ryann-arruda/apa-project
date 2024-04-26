@@ -7,7 +7,7 @@ all: solver
 	rm -f *.o
 
 solver: solver.o instance_reader.o neighborhood_structure.o
-	$(CC) -o solver solver.o instance_reader.o neighborhood_structure.o
+	$(CC) -O2 -o solver solver.o instance_reader.o neighborhood_structure.o
 
 solver.o: solver.cpp
 	$(CC) -c solver.cpp
