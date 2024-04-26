@@ -3,20 +3,23 @@
 #include <random>
 #include <utility>
 #include <chrono>
+#include <thread>
 #include <limits>
 
 std::pair<std::vector<Serv>, Local> exploreNeighborhood(int current, std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<Serv>, Local> preSolution){
     
     switch(current){
         case 0:
-            return makeReinsertion(m_cost, m_time, preSolution);
+            return makeReinsertion(m_cost, m_time, preSolution);            
             break;
+
         case 1:
             return makeSwap(m_cost, m_time, preSolution);
             break;
-        /*case 2:
-            return makeModifiedEjectionChain(m_cost, m_time, preSolution);
-            break;*/
+
+        case 2:
+            return makeBlockReinsertion(m_cost, m_time, preSolution);
+            break;
         
         default:
             std::pair<std::vector<Serv>, Local> aux;
@@ -196,34 +199,58 @@ std::pair<std::vector<Serv>, Local> makeReinsertion(std::vector<std::vector<int>
     return preSolution;
 }
 
-std::pair<std::vector<Serv>, Local> makeModifiedEjectionChain(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<Serv>, Local> preSolution){
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::default_random_engine generator(seed);
-    int job;
+std::pair<std::vector<Serv>, Local> makeBlockReinsertion(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::pair<std::vector<Serv>, Local> preSolution){
+    std::vector<Serv> &servs = preSolution.first;
+    Local &local = preSolution.second;
 
-    for(int serv = 0; serv < preSolution.first.size() - 1; serv++){
-        std::uniform_int_distribution<int> jobs_serv(0,preSolution.first[serv].job_indexes.size() - 1);
+    int origin_serv = -1, dest_serv = -1;
+    int origin_job = -1;
+    int best_cost = std::numeric_limits<int>::max();
+    for(int serv1 = 0; serv1 < servs.size(); serv1++){
+        int numb_jobs = servs[serv1].job_indexes.size();
 
-        job = jobs_serv(generator);
+        if(numb_jobs < 2){
+            continue;
+        }
 
-        if(preSolution.first[serv + 1].capacity >= m_time[serv + 1][job]){
-            if(m_cost[serv + 1][job] < m_cost[serv][job]){
-                preSolution.first[serv].job_indexes.erase(preSolution.first[serv].job_indexes.begin()+job);
-                preSolution.first[serv].capacity += m_time[serv][job];
-                preSolution.first[serv + 1].job_indexes.push_back(job);
-                preSolution.first[serv + 1].capacity -= m_time[serv][job];
+        for(int initial_job = 0; initial_job < numb_jobs - 1; initial_job++){
+            
+            for(int serv2 = 0; serv2 < servs.size(); serv2++){
+
+                if(serv2 == serv1){
+                    continue;
+                }
+
+                int job1_index = servs[serv1].job_indexes[initial_job];
+                int job2_index = servs[serv1].job_indexes[initial_job + 1];
+
+                int space_required = m_time[serv2][job1_index] + m_time[serv2][job2_index];
+
+                if(servs[serv2].capacity >= space_required){
+                    int cost = m_cost[serv2][job1_index] + m_cost[serv2][job2_index] - m_cost[serv1][job1_index] - m_cost[serv1][job2_index];
+
+                    if(cost < best_cost){
+                        best_cost = cost;
+                        origin_serv = serv1;
+                        dest_serv = serv2;
+                        origin_job = initial_job;
+                    }
+                }
             }
         }
     }
 
-    int last_serv = preSolution.first.size() - 1;
-    std::uniform_int_distribution<int> jobs_serv(0,preSolution.first[last_serv].job_indexes.size() - 1);
-    job = jobs_serv(generator);
+    if(origin_serv != -1){
+        int job1_index = servs[origin_serv].job_indexes[origin_job];
+        int job2_index = servs[origin_serv].job_indexes[origin_job + 1];
 
-    if(preSolution.second.local_cost < m_cost[last_serv][job]){
-        preSolution.second.job_indexes.push_back(preSolution.first[last_serv].job_indexes[job]);
-        preSolution.first[last_serv].job_indexes.erase(preSolution.first[last_serv].job_indexes.begin()+job);
-        preSolution.first[last_serv].capacity += m_time[last_serv][job];
+        servs[origin_serv].capacity += m_time[origin_serv][job1_index] + m_time[origin_job][job2_index];
+        servs[origin_serv].job_indexes.erase(servs[origin_serv].job_indexes.begin() + origin_job);
+        servs[origin_serv].job_indexes.erase(servs[origin_serv].job_indexes.begin() + origin_job);
+
+        servs[dest_serv].capacity -= m_time[dest_serv][job1_index] + m_time[dest_serv][job2_index];
+        servs[dest_serv].job_indexes.push_back(job1_index);
+        servs[dest_serv].job_indexes.push_back(job2_index);
     }
 
     return preSolution;
