@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     std::vector<std::vector<int>> m_time, m_cost;
     Local local;
 
-    std::string path = "test instances/n60m10A.txt";
+    std::string path = "test instances/n5m15A.txt";
 
     read_instance(path, servs, m_time, m_cost, local);
 
@@ -25,6 +25,7 @@ int main(int argc, char* argv[]) {
 
     auto start = std::chrono::high_resolution_clock::now();
     greedy_algorithm(m_cost, m_time, servs, local, solution);
+    std::cout << "Valor (guloso): " << objective_function(m_cost, solution) << std::endl;
     auto end = std::chrono::high_resolution_clock::now();
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
@@ -43,38 +44,80 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
+bool check(std::vector<int> &check_servs){
+    bool answer = false;
+
+    for(int i = 0; i < check_servs.size(); i++){
+
+        if(check_servs[i] == 0){
+            answer = true;
+        }
+    }
+
+    return answer;
+}
+
 void greedy_algorithm(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::vector<Serv> &servs, Local& local, std::pair<std::vector<Serv>, Local> &solution){
-    std::vector<std::vector<double>> cost_per_minute;
+    std::vector<int> jobs;
+    std::vector<int> check_servs;
 
     for(int i = 0; i < m_cost.size(); i++){
-        std::vector<double> line; 
-        
-        for(int j = 0; j < m_cost[i].size(); j++){
-            line.push_back((double)m_cost[i][j]/m_time[i][j]);
-        }
-
-        cost_per_minute.push_back(line);
+        check_servs.push_back(0);
     }
-    
-    for(int job = 0; job < cost_per_minute[0].size(); job++){
-        double best = std::numeric_limits<double>::max();
-        int index = -1;
 
-        for(int serv = 0; serv < cost_per_minute.size(); serv++){
-            if(cost_per_minute[serv][job] < best && m_time[serv][job] <= servs[serv].capacity){
-                best = cost_per_minute[serv][job];
-                index = serv;
+    for(int i = 0; i < m_cost[0].size(); i++){
+        jobs.push_back(i);
+    }
+
+    while(check(check_servs)){
+
+        for(int serv = 0; serv < m_cost.size(); serv++){
+            double best = std::numeric_limits<double>::max();
+            int job_index = -1;
+
+            for(int job = 0; job < jobs.size(); job++){
+                double cost = m_time[serv][jobs[job]];
+
+                if(cost < best && m_time[serv][jobs[job]] <= servs[serv].capacity){
+                    best = cost;
+                    job_index = job;
+                }
+            }
+
+            if(job_index != -1){
+                servs[serv].capacity -= m_time[serv][jobs[job_index]];
+                servs[serv].job_indexes.push_back(jobs[job_index]);
+                jobs.erase(jobs.begin()+job_index); 
+            }
+            else{
+                check_servs[serv] = 1;
             }
         }
+    }
 
-        if(index != -1){
-            (servs[index].job_indexes).push_back(job);
-            servs[index].capacity -= m_time[index][job];
-        }
-        else{
-            local.job_indexes.push_back(job);
+    if(jobs.size() > 0){
+        for(int job = 0; job < jobs.size(); job++){
+            local.job_indexes.push_back(jobs[job]);
         }
     }
+
+    for(int serv = 0; serv < servs.size(); serv++){
+        for(int job = 0; job < servs[serv].job_indexes.size(); job++){
+            std::cout << servs[serv].job_indexes[job] << " ";
+        }
+
+        std::cout << std::endl;
+    }
+
+    std::cout << "--------------------------------------" << std::endl;
+
+    for(int job = 0; job < local.job_indexes.size(); job++){
+        std::cout << local.job_indexes[job] << " ";
+    }
+
+    std::cout << std::endl;
+
+    std::cout << "COLOCAR PARA RECEBER O NOME DO ARQUIVO PELO TERMINAL" << std::endl;
 
     solution.first = servs;
     solution.second = local;
