@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
     std::pair<std::vector<Serv>, Local> solution;
 
     auto start = std::chrono::high_resolution_clock::now();
-    greedy_algorithm(m_cost, m_time, servs, local, solution);
+    greedy_algorithm(m_time, servs, local, solution);
     auto end = std::chrono::high_resolution_clock::now();
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);

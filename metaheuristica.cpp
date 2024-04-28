@@ -60,7 +60,7 @@ std::pair<std::vector<Serv>, Local> pertubation(std::pair<std::vector<Serv>, Loc
 std::pair<std::vector<Serv>, Local> ILS(std::vector<std::vector<int>> &m_cost, std::vector<std::vector<int>> &m_time, std::vector<Serv> &servs, Local& local, int ILSMax){
     std::pair<std::vector<Serv>, Local> solution;
 
-    greedy_algorithm(m_cost, m_time, servs, local, solution);
+    greedy_algorithm(m_time, servs, local, solution);
     solution = vnd(3, m_cost, m_time, solution);
 
     int currentILS = 0;
