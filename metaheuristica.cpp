@@ -26,9 +26,14 @@ std::pair<std::vector<Serv>, Local> pertubation(std::pair<std::vector<Serv>, Loc
             int job_index1 = servs[serv1].job_indexes[job1];
             int job_index2 = servs[serv2].job_indexes[job2];
 
+            /* A capacidade do servidor para realizar a troca de um job com outro em outro servidor
+            * consiste da soma da capacidade residual do servidor com o tempo que o job que irá sair
+            * liberará.
+            */
             int time_to_execute1 = m_time[serv1][job_index1] + servs[serv1].capacity;
             int time_to_execute2 = m_time[serv2][job_index2] + servs[serv2].capacity;
 
+            // O primeiro job possível de ser troca é escolhido 
             if(time_to_execute1 >= m_time[serv1][job_index2] && time_to_execute2 >= m_time[serv2][job_index1]){
                 origin_job = job1;
                 dest_job = job2;
@@ -41,6 +46,7 @@ std::pair<std::vector<Serv>, Local> pertubation(std::pair<std::vector<Serv>, Loc
         }
     }
 
+    // Verifica se encontrou jobs possíveis de serem trocados entre os servidores
     if(origin_job != -1){
         int job1_index = servs[serv1].job_indexes[origin_job];
         int job2_index = servs[serv2].job_indexes[dest_job];
