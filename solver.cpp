@@ -13,8 +13,12 @@ int main(int argc, char* argv[]) {
     std::vector<std::vector<int>> m_time, m_cost;
     Local local;
 
-    if(argc != 2){
-        std::cerr << "Ausência de arquivos! Informado apenas: " << argv[0] << std::endl;
+    if(argc < 2){
+        std::cerr << "Ausência de parâmetros! Informado apenas: [" << argv[0] << "] - Falta o nome da instância e o valor ILSMax." << std::endl;
+        return 1;
+    }
+    else if(argc < 3){
+        std::cerr << "Ausência de parâmetros! Informado apenas: [" << argv[0] << "], [" << argv[1] << "] - Falta o valor ILSMax." << std::endl;
         return 1;
     }
 
@@ -44,8 +48,10 @@ int main(int argc, char* argv[]) {
 
     std::cout << std::endl;
 
+    int ILSMax = std::stoi(argv[2]);
+
     start = std::chrono::high_resolution_clock::now();
-    std::pair<std::vector<Serv>, Local> solution_ils = ILS(m_cost, m_time, servs, local, 100);
+    std::pair<std::vector<Serv>, Local> solution_ils = ILS(m_cost, m_time, servs, local, ILSMax);
     end = std::chrono::high_resolution_clock::now();
 
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
