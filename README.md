@@ -35,7 +35,7 @@ The table below is the **c matrix**
 
 In this case, a possible solution would be as follows:
 
-![solution_apa](https://github.com/ryann-arruda/apa-project/assets/53544629/b0effb4b-9e29-4013-b61e-655f13d5502d)
+![apa_solution](https://github.com/ryann-arruda/apa-project/assets/53544629/56f02020-0a11-4a10-971e-8069c1710bc1)
 
 ## Implemented Algorithms
 
