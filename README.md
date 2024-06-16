@@ -171,6 +171,8 @@ Where,
 * Alexandre Bezerra ([Alexandreprog](https://github.com/Alexandreprog))
 * Ryann Carlos ([ryann-arruda](https://github.com/ryann-arruda))
 
-## Note
+## Notes
 
-This README was produced through adaptations of the project specification provided by the Professor of the subject, as well as through materials also made available by him and class notes from the subject.
+* **NOTE**$_1$:This README was produced through adaptations of the project specification provided by the Professor of the subject, as well as through materials also made available by him and class notes from the subject.
+
+* **NOTE**$_2$: All instances present in this repository were provided by the Professor; therefore, they are his intellectual property and cannot be distributed and used for commercial purposes.
