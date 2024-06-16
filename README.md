@@ -94,20 +94,19 @@ Metaheuristic algorithms are capable of finding good solutions and, in some case
 The metaheuristic chosen to be implemented was ILS (Iterated Local Search). The general idea of ​​this algorithm is that a local search procedure can be improved by generating new initial solutions through perturbations of the local optimal solution.
 
 The pseudocode of this algorithm can be viewed below.
-$$
-\begin{aligned}
-& \textbf{\text{procedure ILS}} \\
-& \quad s_0 \leftarrow \text{GenerateInitialSolution()}; \\
-& \quad s \leftarrow \text{LocalSearch}(s_0); \\
-& \quad \text{\underline{while}} \text{(the stopping criteria are not satisfied)} \quad \text{\underline{do}}\\
-& \quad \quad s' \leftarrow \text{Perturbation(historic, s)}\\
-& \quad \quad s'' \leftarrow \text{LocalSearch(s')};\\
-& \quad \quad s \leftarrow \text{AcceptanceCriteria(s, s'', historic)}; \\
-& \quad \text{\underline{end-while}} \\
-& \quad \text{Return s} \\
-& \text{\textbf{end} ILS};
-\end{aligned}
-$$
+<pre>
+<b>procedure ILS</b>
+  s<sub>0</sub> ← GenerateInitialSolution();
+  s ← LocalSearch(s<sub>0</sub>);
+  
+  <u>while</u> (the stopping criteria are not satisfied) <u>do</u>
+    s' ← Perturbation(historic, s);
+    s'' ← LocalSearch(s');
+    s ← AcceptanceCriteria(s, s'', historic);
+  <u>end-while</u>
+  Return s;
+<b>end ILS</b>;
+</pre>
 
 ## Input File Format
 
