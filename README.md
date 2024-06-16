@@ -66,25 +66,24 @@ An important observation that the Professor made was that all structures in the 
 The **Local Search Algorithm** requested by the Professor to be implemented was VND (Variable Neighborhood Descent). It explores the solution space through systematic neighborhood exchanges.
 
 The pseudocode of this algorithm can be viewed below.
-$$
-\begin{aligned}
-& \textbf{\text{procedure VND}}(f(.), N(.), r, s) \\
-& \quad \text{Let } r \text{ be the number of different neighborhood structures;} \\
-& \quad k \leftarrow 1; \quad \quad \quad \{ \text{Current neighborhood structure type} \} \\ \\
-& \quad \underline{\text{while}}(k \leq r) \quad \underline{\text{do}} \\
-& \quad \quad \text{Find the best neighbor} \quad s' \in N^{(k)}(s); \\
-& \quad \quad \underline{\text{if}} (f(s') < f(s)) \\
-& \quad \quad \quad \underline{\text{so}} \\
-& \quad \quad \quad \quad s \leftarrow s'; \\
-& \quad \quad \quad \quad k \leftarrow 1; \\
-& \quad \quad \quad \underline{\text{else}} \\
-& \quad \quad \quad \quad \quad k \leftarrow k + 1; \\
-& \quad \quad \underline{\text{end-if}}; \\
-& \quad \underline{\text{end-while}}; \\
-& \quad \text{Return s} \\
-& \text{\textbf{end} VND};
-\end{aligned}
-$$
+
+<pre>
+<b>procedure VND</b>(f(.), N(.), r, s)
+  Let r be the number of different neighborhood structures;
+  k ← 1;        { Current neighborhood structure type }
+
+  <u>while</u> (k ≤ r) <u>do</u>
+    Find the best neighbor s' ∈ N<sup>(k)</sup>(s);
+    <u>if</u> (f(s') < f(s)) <u>then</u>
+      s ← s';
+      k ← 1;
+    <u>else</u>
+      k ← k + 1;
+    <u>end-if</u>;
+  <u>end-while</u>;
+  Return s;
+<b>end VND</b>;
+</pre>
 
 ### Metaheuristics
 
